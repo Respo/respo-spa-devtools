@@ -5,7 +5,8 @@ ns respo-spa-devtools.component.container $ :require
 
 def style-container
 
-def container-component $ {} (:initial-state $ {})
+def container-component $ {} (:name :container)
+  :initial-state $ {}
   :render $ fn (store state)
     [] :div
       {} $ :style style-container

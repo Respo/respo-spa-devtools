@@ -16,6 +16,7 @@ defn handle-add (store state)
 
 def todolist-component $ {}
   :initial-state $ {} $ :draft |
+  :name :todolist
   :render $ fn (store state)
     let
       (tasks store)

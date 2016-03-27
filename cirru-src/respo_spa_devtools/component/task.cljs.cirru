@@ -39,6 +39,7 @@ defn handle-remove (task state)
 
 def task-component $ {}
   :initial-state $ {} $ :draft |
+  :name :task
   :render $ fn (task state)
     [] :div
       {} $ :style style-task

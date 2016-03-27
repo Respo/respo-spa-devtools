@@ -2,6 +2,7 @@
 ns respo-spa-devtools.component.treeview $ :require
   [] hsl.core :refer $ [] hsl
   [] respo-spa-devtools.component.element :refer $ [] element-component
+  [] respo.controller.resolver :refer $ [] get-element-at
 
 def style-treeview $ {} $ :display |flex
 
@@ -32,30 +33,37 @@ defn style-rect (rect)
 def treeview-component $ {}
   :initial-state $ {} $ :pointer nil
   :render $ fn (props state)
-    [] :div
-      {} $ :style style-treeview
-      [] element-component $ {}
-        :element $ :element props
-        :store $ :devtools-store props
-      [] :div ({})
-        ->>
-          -> props :devtools-store :focus
-          filter $ fn (entry)
-            not= (key entry)
-              , :children
+    let
+        element $ :element props
+        devtools-store $ :devtools-store props
+        focused-coord $ :focus devtools-store
+      [] :div
+        {} $ :style style-treeview
+        [] element-component $ {} (:element element)
+          :store devtools-store
+        [] :div ({})
+          if (some? focused-coord)
+            let
+                target-element $ get-element-at (:element props)
+                  , focused-coord
 
-          map $ fn (entry)
-            [] (key entry)
-              [] :div
-                {} $ :style style-entry
-                [] :div $ {} (:style style-key)
-                  :inner-text $ name $ key entry
-                [] :div $ {} (:style style-value)
-                  :inner-text $ pr-str $ val entry
+              ->> target-element
+                filter $ fn (entry)
+                  not= (key entry)
+                    , :children
 
-          into $ sorted-map
+                map $ fn (entry)
+                  [] (key entry)
+                    [] :div
+                      {} $ :style style-entry
+                      [] :div $ {} (:style style-key)
+                        :inner-text $ name $ key entry
+                      [] :div $ {} (:style style-value)
+                        :inner-text $ pr-str $ val entry
 
-      let
-          rect $ :rect $ :devtools-store props
-        if (some? rect)
-          [] :div $ {} $ :style $ style-rect rect
+                into $ sorted-map
+
+        let
+            rect $ :rect $ :devtools-store props
+          if (some? rect)
+            [] :div $ {} $ :style $ style-rect rect

@@ -10,6 +10,7 @@ ns respo-spa-devtools.core $ :require
   [] respo-spa-devtools.component.container :refer $ [] container-component
   [] respo-spa-devtools.updater.core :refer $ [] updater
   [] respo-spa-devtools.component.devtools :refer $ [] devtools-component
+  [] cljs.reader :refer $ [] read-string
 
 defonce global-states $ atom $ {}
 
@@ -114,8 +115,22 @@ defn -main ()
   add-watch devtools-store :rerender rerender-app
   add-watch devtools-states :renderer rerender-app
 
+defn listen-context-menu (event)
+  .log js/console event.target
+  let
+      click-target $ .-target event
+      coord $ -> click-target .-dataset .-coord
+    if (string? coord)
+      do (.preventDefault event)
+        swap! devtools-store assoc :focus (read-string coord)
+          , :rect
+          .getBoundingClientRect click-target
+
 set! (.-onload js/window)
   , -main
+
+set! (.-oncontextmenu js/window)
+  , listen-context-menu
 
 defn on-jsload ()
   .info js/console "|Reload app"

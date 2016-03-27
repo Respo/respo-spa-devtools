@@ -50,6 +50,7 @@ def task-component $ {}
         :on-change $ handle-change task state
         :value $ :text task
         :style style-input
+        :placeholder "|Describe the task"
       [] :div $ {}
         :on-click $ handle-remove task state
         :style style-remove

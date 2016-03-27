@@ -45,7 +45,8 @@ defn handle-click (props state)
         rect $ .getBoundingClientRect target
 
       .log js/console selector $ js->clj rect
-      intent $ {} (:focus element)
+      intent $ {}
+        :focus $ :coord element
         :rect rect
 
 def element-component $ {} (:initial-state $ {})
@@ -55,7 +56,7 @@ def element-component $ {} (:initial-state $ {})
         store $ :store props
       [] :div
         {} $ :style $ style-element $ = (:coord element)
-          :coord $ :focus store
+          :focus store
         [] :div
           {} $ :style style-info
           if

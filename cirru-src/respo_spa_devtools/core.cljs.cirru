@@ -17,6 +17,9 @@ defonce global-element $ atom nil
 
 defonce global-store $ atom schema/store
 
+defonce devtools-store $ atom $ {} (:mount-point |#app)
+  :visible? true
+
 defonce devtools-states $ atom $ {}
 
 defonce global-devtools-element $ atom nil
@@ -31,8 +34,14 @@ defn render-devtools-element ()
       app-element $ purify-element $ render-element
     render-app
       [] devtools-component $ {} (:element app-element)
+        :devtools-store @devtools-store
         :store @global-store
         :states @global-states
+        :style $ {} (:top |200px)
+          :left |300px
+          :width |800px
+          :height |300px
+
       , @devtools-states
 
 defn intent (op-type op-data)
@@ -41,8 +50,9 @@ defn intent (op-type op-data)
       new-store $ updater @global-store op-type op-data $ .valueOf $ js/Date.
     reset! global-store new-store
 
-defn devtools-intent ()
-  .warn js/console "|No intent for devtools"
+defn devtools-intent (changes)
+  .info js/console "|DevTools intent:" changes
+  swap! devtools-store merge changes
 
 defn get-root ()
   .querySelector js/document |#app
@@ -101,6 +111,7 @@ defn -main ()
   mount-app
   add-watch global-store :rerender rerender-app
   add-watch global-states :rerender rerender-app
+  add-watch devtools-store :rerender rerender-app
   add-watch devtools-states :renderer rerender-app
 
 set! (.-onload js/window)

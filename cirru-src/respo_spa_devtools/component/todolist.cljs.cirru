@@ -5,6 +5,16 @@ ns respo-spa-devtools.component.todolist $ :require
 
 def style-todolist $ {} $ :font-family |Verdana
 
+def style-input $ {} (:line-height |32px)
+  :font-size |16px
+  :border |none
+  :outline |none
+
+def style-add $ {}
+  :background-color $ hsl 200 80 80
+  :color |white
+  :padding "|0 16px"
+
 defn handle-change (props state)
   fn (simple-event intent set-state)
     set-state $ {} $ :draft $ :value simple-event
@@ -21,13 +31,15 @@ def todolist-component $ {}
     let
       (tasks store)
       [] :div ({} :style style-todolist)
-        [] :span $ {} :inner-text |Todolist
         [] :div ({})
           [] :input $ {}
             :value $ :draft state
             :on-input $ handle-change store state
+            :placeholder "|new task"
+            :style style-input
           [] :span $ {} (:inner-text |Add)
             :on-click $ handle-add store state
+            :style style-add
 
         [] :div ({})
           ->> tasks

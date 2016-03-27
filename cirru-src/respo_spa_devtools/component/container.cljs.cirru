@@ -8,7 +8,5 @@ def style-container
 def container-component $ {} (:name :container)
   :initial-state $ {}
   :render $ fn (store state)
-    [] :div
-      {} $ :style style-container
-      [] :span $ {} $ :inner-text |Container
+    [] :div ({})
       [] todolist-component store

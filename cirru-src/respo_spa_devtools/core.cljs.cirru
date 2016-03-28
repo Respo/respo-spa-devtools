@@ -38,7 +38,7 @@ defn render-devtools-element ()
         :devtools-store @devtools-store
         :store @global-store
         :states @global-states
-        :style $ {} (:top |200px)
+        :style $ {} (:top |100px)
           :left |300px
           :width |800px
           :height |300px

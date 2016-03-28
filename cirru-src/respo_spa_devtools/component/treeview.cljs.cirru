@@ -63,6 +63,11 @@ def treeview-component $ {}
 
                 into $ sorted-map
 
+        [] :div ({})
+          if (some? focused-coord)
+            [] :span $ {} $ :inner-text $ pr-str $ get (:states props)
+              , focused-coord
+
         let
             rect $ :rect $ :devtools-store props
           if (some? rect)

@@ -13,3 +13,4 @@ def recorder $ {} (:initial nil)
   :records $ []
   :visiting? false
   :changes nil
+  :state $ {}

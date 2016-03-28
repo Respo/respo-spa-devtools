@@ -39,8 +39,7 @@ defn select-tab (target)
 def devtools-component $ {}
   :initial-state $ {} $ :tab :elements
   :render $ fn (props state)
-    if
-      :visible? $ :devtools-store props
+    if (:visible? props)
       [] :div
         {} $ :style $ style-devtools $ :style props
         [] :div

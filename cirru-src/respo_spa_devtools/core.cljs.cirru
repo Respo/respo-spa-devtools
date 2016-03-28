@@ -9,6 +9,7 @@ ns respo-spa-devtools.core $ :require
   [] respo-spa-devtools.schema :as schema
   [] respo-spa-devtools.component.container :refer $ [] container-component
   [] respo-spa-devtools.updater.core :refer $ [] updater
+  [] respo-spa-devtools.updater.recorder :refer $ [] update-recorder
   [] respo-spa-devtools.component.devtools :refer $ [] devtools-component
   [] cljs.reader :refer $ [] read-string
 
@@ -16,44 +17,45 @@ defonce global-states $ atom $ {}
 
 defonce global-element $ atom nil
 
-defonce global-store $ atom schema/store
-
-defonce devtools-store $ atom $ {} (:mount-point |#app)
-  :visible? true
+defonce devtools-store $ atom $ assoc schema/recorder :state $ {}
 
 defonce devtools-states $ atom $ {}
 
 defonce global-devtools-element $ atom nil
 
 defn render-element ()
-  render-app ([] container-component @global-store)
+  render-app
+    [] container-component $ :store @devtools-store
     , @global-states
 
 defn render-devtools-element ()
   .info js/console "|render devtools" @devtools-states
   let
-      app-element $ purify-element $ render-element
+    (app-element $ render-element)
+    .log js/console @devtools-store
     render-app
       [] devtools-component $ {} (:element app-element)
         :devtools-store @devtools-store
-        :store @global-store
-        :states @global-states
+        :store $ :store @devtools-store
         :style $ {} (:top |100px)
           :left |300px
           :width |800px
           :height |300px
+        :visible? true
+        :mount-point |#app
 
       , @devtools-states
 
+defn devtools-intent (op-type op-data)
+  .info js/console "|DevTools intent:" op-type op-data
+  let
+      op-id $ .valueOf $ js/Date.
+      new-store $ update-recorder @devtools-store updater op-type op-data op-id
+    reset! devtools-store new-store
+
 defn intent (op-type op-data)
   .info js/console |Intent: op-type op-data
-  let
-      new-store $ updater @global-store op-type op-data $ .valueOf $ js/Date.
-    reset! global-store new-store
-
-defn devtools-intent (changes)
-  .info js/console "|DevTools intent:" changes
-  swap! devtools-store merge changes
+  devtools-intent :record $ [] op-type op-data $ .valueOf $ js/Date.
 
 defn get-root ()
   .querySelector js/document |#app
@@ -110,7 +112,6 @@ defn -main ()
   devtools/install!
   .info js/console "|App started"
   mount-app
-  add-watch global-store :rerender rerender-app
   add-watch global-states :rerender rerender-app
   add-watch devtools-store :rerender rerender-app
   add-watch devtools-states :renderer rerender-app

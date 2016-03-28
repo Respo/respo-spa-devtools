@@ -34,9 +34,10 @@ def style-children $ {}
 defn handle-click (props state)
   fn (simple-event intent set-state)
     let
+        devtools-state $ :state props
         element $ :element props
-        store $ :store props
-        mount-point $ :mount-point store
+        store $ :store devtools-state
+        mount-point $ :mount-point props
         coord $ :coord element
         selector $ str "|[data-coord=\"" (pr-str coord)
           , "|\"]"
@@ -45,18 +46,19 @@ defn handle-click (props state)
         rect $ .getBoundingClientRect target
 
       .log js/console selector $ js->clj rect
-      intent $ {}
+      intent :state $ {}
         :focus $ :coord element
         :rect rect
 
 def element-component $ {} (:initial-state $ {})
   :render $ fn (props state)
     let
+        devtools-state $ :state props
         element $ :element props
         store $ :store props
       [] :div
         {} $ :style $ style-element $ = (:coord element)
-          :focus store
+          :focused props
         [] :div
           {} $ :style style-info
           if
@@ -76,6 +78,7 @@ def element-component $ {} (:initial-state $ {})
               [] (key entry)
                 [] element-component $ {}
                   :element $ val entry
-                  :store store
+                  :focused $ :focused props
+                  :mount-point $ :mount-point props
 
             into $ sorted-map

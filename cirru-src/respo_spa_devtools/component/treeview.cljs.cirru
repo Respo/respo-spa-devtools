@@ -36,11 +36,12 @@ def treeview-component $ {}
     let
         element $ :element props
         devtools-store $ :devtools-store props
-        focused-coord $ :focus devtools-store
+        focused-coord $ :focus $ :state devtools-store
       [] :div
         {} $ :style style-treeview
         [] element-component $ {} (:element element)
-          :store devtools-store
+          :mount-point $ :mount-point props
+          :focused focused-coord
         [] :div ({})
           if (some? focused-coord)
             let
@@ -69,6 +70,6 @@ def treeview-component $ {}
               , focused-coord
 
         let
-            rect $ :rect $ :devtools-store props
+            rect $ :rect $ :state $ :devtools-store props
           if (some? rect)
             [] :div $ {} $ :style $ style-rect rect

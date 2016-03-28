@@ -19,15 +19,17 @@ defn regenerate-store (initial-store updater records)
         butlast records
 
 defn update-recorder
-  old-recorder updater op-type op-data
+  old-recorder updater op-type op-data op-id
   case op-type
+    :state $ update old-recorder :state $ fn (old-state)
+      merge old-state op-data
     :record $ if (:visiting? old-recorder)
       update old-recorder :records $ fn (records)
         conj records op-data
       -> old-recorder
         update :records $ fn (records)
           conj records op-data
-        update :store $ updater (:store old-recorder)
+        assoc :store $ updater (:store old-recorder)
           get op-data 0
           get op-data 1
           get op-data 2

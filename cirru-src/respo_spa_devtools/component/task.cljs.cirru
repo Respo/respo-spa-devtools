@@ -3,6 +3,10 @@ ns respo-spa-devtools.component.task $ :require
   [] hsl.core :refer $ [] hsl
 
 def style-task $ {} (:display |flex)
+  :width |100%
+  :padding |4px
+  :background-color $ hsl 0 0 100
+  :margin-bottom |4px
 
 defn style-toggle (done?)
   {} (:width |32px)
@@ -18,11 +22,12 @@ def style-input $ {} (:outline |none)
   :border |none
   :font-size |16px
   :font-family |Verdana
+  :flex |1
 
 def style-remove $ {} (:width |32px)
   :height |32px
   :background-color $ hsl 0 80 80
-  :style |pointer
+  :cursor |pointer
 
 defn handle-toggle (task state)
   fn (simple-event dispatch mutate)

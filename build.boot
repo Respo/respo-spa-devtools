@@ -14,7 +14,7 @@
                  [org.clojure/core.async "0.2.374"  :scope "test"]
                  [mvc-works/respo "0.1.10"          :scope "test"]
                  [mvc-works/respo-client "0.1.9"    :scope "test"]
-                 [mvc-works/respo-value "0.1.0"]
+                 [mvc-works/respo-value "0.1.1"]
                  [mvc-works/hsl "0.1.2"]])
 
 (require '[adzerk.boot-cljs   :refer [cljs]]

@@ -4,16 +4,20 @@ ns respo-spa-devtools.component.todolist $ :require
   respo-spa-devtools.component.task :refer $ [] task-component
 
 def style-todolist $ {} (:font-family |Verdana)
+  :width |400px
+  :box-shadow $ str "|0 0 1px "
+    hsl 0 0 0 0.3
+  :background-color $ hsl 200 70 94
 
-def style-nothing $ {} (:width |32px)
-  :height |32px
-  :background-color $ hsl 0 0 90
-  :display |inline-block
+def style-header $ {} (:width |100%)
+  :display |flex
+  :padding |4px
 
 def style-input $ {} (:line-height |32px)
   :font-size |16px
   :border |none
   :outline |none
+  :flex |1
 
 def style-add $ {}
   :background-color $ hsl 200 80 80
@@ -21,6 +25,7 @@ def style-add $ {}
   :padding "|0 16px"
   :line-height |32px
   :display |inline-block
+  :cursor |pointer
 
 defn handle-change (props state)
   fn (simple-event dispatch mutate)
@@ -41,8 +46,8 @@ def todolist-component $ {} (:name :todolist)
       let
         (tasks store)
         [] :div ({} :style style-todolist)
-          [] :div ({})
-            [] :div $ {} (:style style-nothing)
+          [] :div
+            {} $ :style style-header
             [] :input $ {}
               :value $ :draft state
               :on-input $ handle-change store state

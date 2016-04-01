@@ -40,7 +40,7 @@ defn render-devtools-element ()
       [] devtools-component $ {} (:element app-element)
         :devtools-store @devtools-store
         :store $ :store @devtools-store
-        :style $ {} (:top |100px)
+        :style $ {} (:top |200px)
           :left |300px
           :width |800px
           :height |300px

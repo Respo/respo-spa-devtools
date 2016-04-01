@@ -24,13 +24,14 @@ def style-header $ {} (:margin-bottom |12px)
 defn style-tab (selected?)
   {} (:display |inline-block)
     :padding "|0 8px"
-    :margin |0px
+    :margin-right |8px
     :color $ hsl 0 0 100
     :background-color $ if selected?
       hsl 200 80 60
       hsl 200 80 70
     :line-height |24px
     :cursor |pointer
+    :font-family "|Source code pro, Menlo, monospace"
 
 def style-content $ {}
   :background-color $ hsl 80 80 100

@@ -16,13 +16,26 @@ def style-body $ {}
 
 def style-records $ {} (:width |240px)
   :margin-right |16px
+  :overflow-y |auto
 
-def style-record $ {} (:font-family "|Source code pro, menlo, monospace")
-  :background-color $ hsl 120 70 70
-  :padding "|0 8px"
-  :line-height |24px
-  :color |white
-  :cursor |pointer
+defn style-records-list (n)
+  {}
+    :height $ str (* 24 n)
+      , |px
+    :position |relative
+
+defn style-record (index)
+  {} (:font-family "|Source code pro, menlo, monospace")
+    :background-color $ hsl 120 70 70
+    :padding "|0 8px"
+    :line-height |24px
+    :color |white
+    :cursor |pointer
+    :top $ str (* index 24)
+      , |px
+    :position |absolute
+    :width |100%
+    :transition-duration |200ms
 
 def style-tab $ {} (:display |inline-block)
   :font-family "|Source code pro, menlo, monospace"
@@ -32,10 +45,38 @@ def style-tab $ {} (:display |inline-block)
   :line-height |24px
   :color $ hsl 0 0 100
   :cursor |pointer
+  :margin-right |8px
+
+def style-toolbar $ {} (:margin-bottom |16px)
+
+def style-button $ {} (:padding "|0 8px")
+  :background-color $ hsl 30 70 50
+  :margin-right |8px
+  :color |white
+  :font-family "|Source code pro, menlo, monospace"
+  :line-height |24px
+  :height |24px
+  :display |inline-block
+  :cursor |pointer
+
+def style-initial $ {} (:font-family "|Source code pro, menlo")
+  :font-size |12px
+  :padding "|0 8px"
+  :color |white
+  :line-height |24px
+  :cursor |pointer
+  :background-color $ hsl 170 80 60
 
 defn select-tab (tab)
   fn (simple-event dispatch mutate)
     mutate tab
+
+defn select-record (index)
+  fn (simple-event dispatch mutate)
+    .info js/console |selecting: index
+
+defn select-initial (simple-event dispatch mutate)
+  .log js/console "|select initial"
 
 def player-component $ {} (:name :player)
   :update-state $ fn (old-state new-state)
@@ -53,17 +94,37 @@ def player-component $ {} (:name :player)
           {} $ :style style-player
           [] :div
             {} $ :style style-records
-            ->> records
-              map-indexed $ fn (index record)
-                [] index $ [] :div
-                  {} $ :style style-record
-                  [] :span $ {}
-                    :inner-text $ first record
+            [] :div
+              {} $ :style
+                style-records-list $ count records
+              ->> records (reverse)
+                map-indexed $ fn (index record)
+                  [] (last record)
+                    [] :div
+                      {}
+                        :style $ style-record index
+                        :on-click $ select-record index
+                      [] :span $ {}
+                        :inner-text $ first record
 
-              into $ sorted-map
+                into $ sorted-map
+
+            [] :div
+              {} (:style style-initial)
+                :on-click select-initial
+              [] :span $ {} (:inner-text |initial)
 
           [] :div
             {} $ :style style-box
+            [] :div
+              {} $ :style style-toolbar
+              [] :span $ {} (:style style-button)
+                :inner-text |commit
+              [] :span $ {} (:style style-button)
+                :inner-text |reset
+              [] :span $ {} (:style style-button)
+                :inner-text |step
+
             [] :div
               {} $ :style style-header
               [] :span $ {} (:style style-tab)

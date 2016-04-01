@@ -13,13 +13,16 @@ ns respo-spa-devtools.core $ :require
   [] respo-spa-devtools.component.devtools :refer $ [] devtools-component
   [] cljs.reader :refer $ [] read-string
 
-defonce global-states $ atom $ {}
+defonce global-states $ atom ({})
 
 defonce global-element $ atom nil
 
-defonce devtools-store $ atom $ assoc schema/recorder :state $ {}
+defonce devtools-store $ atom
+  assoc schema/recorder :state ({})
+    , :initial
+    []
 
-defonce devtools-states $ atom $ {}
+defonce devtools-states $ atom ({})
 
 defonce global-devtools-element $ atom nil
 
@@ -49,13 +52,14 @@ defn render-devtools-element ()
 defn devtools-dispatch (op-type op-data)
   .info js/console "|DevTools dispatch:" op-type op-data
   let
-      op-id $ .valueOf $ js/Date.
+    (op-id $ .valueOf (js/Date.))
       new-store $ update-recorder @devtools-store updater op-type op-data op-id
+
     reset! devtools-store new-store
 
 defn dispatch (op-type op-data)
   .info js/console |dispatch: op-type op-data
-  devtools-dispatch :record $ [] op-type op-data $ .valueOf $ js/Date.
+  devtools-dispatch :record $ [] op-type op-data (.valueOf $ js/Date.)
 
 defn get-root ()
   .querySelector js/document |#app
@@ -119,7 +123,7 @@ defn -main ()
 defn listen-context-menu (event)
   .log js/console event.target
   let
-      click-target $ .-target event
+    (click-target $ .-target event)
       coord $ -> click-target .-dataset .-coord
     if (string? coord)
       do (.preventDefault event)

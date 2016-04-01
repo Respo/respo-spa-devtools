@@ -1,5 +1,6 @@
 
-ns respo-spa-devtools.schema $ :require $ [] clojure.string :as string
+ns respo-spa-devtools.schema $ :require
+  [] clojure.string :as string
 
 def store $ []
 

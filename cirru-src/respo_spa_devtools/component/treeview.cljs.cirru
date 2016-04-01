@@ -58,6 +58,7 @@ def treeview-component $ {} (:name :treeview)
                     not= (key entry)
                       , :children
 
+                  reverse
                   map $ fn (entry)
                     [] (key entry)
                       [] :div

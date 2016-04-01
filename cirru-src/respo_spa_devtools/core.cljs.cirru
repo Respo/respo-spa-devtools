@@ -46,16 +46,16 @@ defn render-devtools-element ()
 
       , @devtools-states
 
-defn devtools-intent (op-type op-data)
-  .info js/console "|DevTools intent:" op-type op-data
+defn devtools-dispatch (op-type op-data)
+  .info js/console "|DevTools dispatch:" op-type op-data
   let
       op-id $ .valueOf $ js/Date.
       new-store $ update-recorder @devtools-store updater op-type op-data op-id
     reset! devtools-store new-store
 
-defn intent (op-type op-data)
-  .info js/console |Intent: op-type op-data
-  devtools-intent :record $ [] op-type op-data $ .valueOf $ js/Date.
+defn dispatch (op-type op-data)
+  .info js/console |dispatch: op-type op-data
+  devtools-dispatch :record $ [] op-type op-data $ .valueOf $ js/Date.
 
 defn get-root ()
   .querySelector js/document |#app
@@ -66,10 +66,10 @@ defn get-devtools-root ()
 declare rerender-app
 
 defn get-deliver-event ()
-  build-deliver-event global-element intent global-states
+  build-deliver-event global-element dispatch global-states
 
 defn get-devtools-deliver-event ()
-  build-deliver-event global-devtools-element devtools-intent devtools-states
+  build-deliver-event global-devtools-element devtools-dispatch devtools-states
 
 defn mount-app ()
   let

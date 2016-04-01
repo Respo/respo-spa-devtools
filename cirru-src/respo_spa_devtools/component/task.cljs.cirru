@@ -25,18 +25,18 @@ def style-remove $ {} (:width |32px)
   :style |pointer
 
 defn handle-toggle (task state)
-  fn (simple-event intent set-state)
-    intent :toggle $ :id task
+  fn (simple-event dispatch mutate)
+    dispatch :toggle $ :id task
 
 defn handle-change (task state)
-  fn (simple-event intent set-state)
-    intent :update $ {}
+  fn (simple-event dispatch mutate)
+    dispatch :update $ {}
       :id $ :id task
       :text $ :value simple-event
 
 defn handle-remove (task state)
-  fn (simple-event intent set-state)
-    intent :rm $ :id task
+  fn (simple-event dispatch mutate)
+    dispatch :rm $ :id task
 
 def task-component $ {} (:name :task)
   :update-state merge

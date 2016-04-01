@@ -6,7 +6,7 @@ defn style-element (focused?)
   {} (:display |flex)
     :align-items |flex-start
     :box-shadow $ str "|0 -1px 0 "
-      hsl 0 0 80
+      hsl 0 0 90
     :background-color $ if focused?
       hsl 200 80 40 0.5
       , |transparent
@@ -18,23 +18,23 @@ def style-info $ {} (:display |flex)
 def style-component $ {}
   :background-color $ hsl 240 50 50 0.5
   :color $ hsl 0 0 100
-  :padding "|0 8px"
+  :padding "|0 4px"
   :font-family |Menlo
 
 def style-name $ {} (:font-family |Menlo)
   :display |inline-block
   :background-color $ hsl 140 80 70 0.5
   :color $ hsl 0 0 100
-  :padding "|0 8px"
+  :padding "|0 4px"
   :height |auto
   :cursor |pointer
 
-def style-space $ {} (:width |24px)
+def style-space $ {} (:width |8px)
 
 def style-children $ {}
 
 defn handle-click (props state)
-  fn (simple-event intent set-state)
+  fn (simple-event dispatch mutate)
     let
       (devtools-state $ :state props)
         element $ :element props
@@ -48,7 +48,7 @@ defn handle-click (props state)
         rect $ .getBoundingClientRect target
 
       .log js/console selector $ js->clj rect
-      intent :state $ {}
+      dispatch :state $ {}
         :focus $ :coord element
         :rect rect
 

@@ -5,7 +5,7 @@
 
  :dev-dependencies '[]
  :dependencies '[[org.clojure/clojure "1.8.0"           :scope "provided"]
-                 [org.clojure/clojurescript "1.7.228"   :scope "provided"]
+                 [org.clojure/clojurescript "1.8.40"    :scope "provided"]
                  [adzerk/boot-cljs "1.7.170-3"      :scope "test"]
                  [adzerk/boot-reload "0.4.6"        :scope "test"]
                  [mvc-works/boot-html-entry "0.1.1" :scope "test"]
@@ -13,7 +13,8 @@
                  [binaryage/devtools "0.5.2"        :scope "test"]
                  [org.clojure/core.async "0.2.374"  :scope "test"]
                  [mvc-works/respo "0.1.9"           :scope "test"]
-                 [mvc-works/respo-client "0.1.8"    :scope "test"]
+                 [mvc-works/respo-client "0.1.9"    :scope "test"]
+                 [mvc-works/respo-value "0.1.0"]
                  [mvc-works/hsl "0.1.2"]])
 
 (require '[adzerk.boot-cljs   :refer [cljs]]

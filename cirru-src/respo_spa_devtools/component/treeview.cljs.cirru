@@ -3,10 +3,12 @@ ns respo-spa-devtools.component.treeview $ :require
   [] hsl.core :refer $ [] hsl
   [] respo-spa-devtools.component.element :refer $ [] element-component
   [] respo.controller.resolver :refer $ [] get-element-at
+  [] respo-value.component.value :refer $ [] render-value
 
 def style-treeview $ {} (:display |flex)
 
 def style-entry $ {} (:display |flex)
+  :min-height |20px
 
 def style-key $ {} (:min-width |160px)
   :font-family |Menlo
@@ -60,20 +62,14 @@ def treeview-component $ {} (:name :treeview)
                     [] (key entry)
                       [] :div
                         {} $ :style style-entry
-                        [] :div $ {} (:style style-key)
-                          :inner-text $ name (key entry)
-
-                        [] :div $ {} (:style style-value)
-                          :inner-text $ pr-str (val entry)
+                        [] :div
+                          {} $ :style style-key
+                          render-value $ key entry
+                        [] :div
+                          {} $ :style style-value
+                          render-value $ val entry
 
                   into $ sorted-map
-
-          [] :div ({})
-            if (some? focused-coord)
-              [] :span $ {}
-                :inner-text $ pr-str
-                  get (:states props)
-                    , focused-coord
 
           let
             (rect $ :rect (:state $ :devtools-store props))

@@ -19,25 +19,25 @@ defn style-devtools (style)
 
     , style
 
-def style-header $ {}
+def style-header $ {} (:margin-bottom |12px)
 
 defn style-tab (selected?)
   {} (:display |inline-block)
-    :padding "|0 16px"
-    :margin |8px
+    :padding "|0 8px"
+    :margin |0px
     :color $ hsl 0 0 100
     :background-color $ if selected?
       hsl 200 80 60
       hsl 200 80 70
-    :line-height |32px
+    :line-height |24px
     :cursor |pointer
 
 def style-content $ {}
   :background-color $ hsl 80 80 100
 
 defn select-tab (target)
-  fn (simple-event intent set-state)
-    set-state $ {} (:tab target)
+  fn (simple-event dispatch mutate)
+    mutate $ {} (:tab target)
 
 def devtools-component $ {} (:name :devtools)
   :update-state merge
@@ -71,7 +71,7 @@ def devtools-component $ {} (:name :devtools)
             {} $ :style style-content
             case (:tab state)
               :elements $ [] treeview-component props
-              :store $ [] player-component props
+              :store $ [] player-component (:devtools-store props)
               [] :span $ {} (:inner-text "|Nothing Selected")
 
         [] :noscript $ {}

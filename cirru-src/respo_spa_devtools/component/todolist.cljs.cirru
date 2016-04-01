@@ -23,14 +23,14 @@ def style-add $ {}
   :display |inline-block
 
 defn handle-change (props state)
-  fn (simple-event intent set-state)
-    set-state $ {}
+  fn (simple-event dispatch mutate)
+    mutate $ {}
       :draft $ :value simple-event
 
 defn handle-add (store state)
-  fn (simple-event intent set-state)
-    intent :add $ :draft state
-    set-state $ {} (:draft |)
+  fn (simple-event dispatch mutate)
+    dispatch :add $ :draft state
+    mutate $ {} (:draft |)
 
 def todolist-component $ {} (:name :todolist)
   :update-state merge

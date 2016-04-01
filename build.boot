@@ -12,8 +12,8 @@
                  [cirru/boot-cirru-sepal "0.1.1"    :scope "test"]
                  [binaryage/devtools "0.5.2"        :scope "test"]
                  [org.clojure/core.async "0.2.374"  :scope "test"]
-                 [mvc-works/respo "0.1.7"           :scope "test"]
-                 [mvc-works/respo-client "0.1.7"    :scope "test"]
+                 [mvc-works/respo "0.1.9"           :scope "test"]
+                 [mvc-works/respo-client "0.1.8"    :scope "test"]
                  [mvc-works/hsl "0.1.2"]])
 
 (require '[adzerk.boot-cljs   :refer [cljs]]
@@ -51,7 +51,7 @@
    [:body {:style "margin: 0;"}
     [:div#app] [:div#devtools] [:script {:src "main.js"}]]])
 
-(deftask gen-static []
+(deftask build-simple []
   (comp
     (cirru-sepal :paths ["cirru-src"])
     (cljs)
@@ -65,7 +65,7 @@
     (reload :on-jsload 'respo-spa-devtools.core/on-jsload)
     (cljs)))
 
-(deftask build-app []
+(deftask build-advanced []
     (comp
         (cljs :optimizations :advanced)
         (html-entry :dsl (html-dsl {:env :build}) :html-name "index.html")))
@@ -78,7 +78,7 @@
 
 (deftask send-tiye []
     (comp
-        (build-app)
+        (build-advanced)
         (rsync)))
 
 (deftask build []

@@ -4,15 +4,15 @@ ns respo-spa-devtools.component.treeview $ :require
   [] respo-spa-devtools.component.element :refer $ [] element-component
   [] respo.controller.resolver :refer $ [] get-element-at
 
-def style-treeview $ {} $ :display |flex
+def style-treeview $ {} (:display |flex)
 
-def style-entry $ {} $ :display |flex
+def style-entry $ {} (:display |flex)
 
 def style-key $ {} (:min-width |160px)
   :font-family |Menlo
   :display |inline-block
 
-def style-value $ {} $ :font-family |Menlo
+def style-value $ {} (:font-family |Menlo)
 
 defn style-rect (rect)
   {}
@@ -30,46 +30,54 @@ defn style-rect (rect)
     :z-index |999
     :pointer-events |none
 
-def treeview-component $ {}
-  :initial-state $ {} $ :pointer nil
-  :render $ fn (props state)
-    let
-        element $ :element props
-        devtools-store $ :devtools-store props
-        focused-coord $ :focus $ :state devtools-store
-      [] :div
-        {} $ :style style-treeview
-        [] element-component $ {} (:element element)
-          :mount-point $ :mount-point props
-          :focused focused-coord
-        [] :div ({})
-          if (some? focused-coord)
-            let
-                target-element $ get-element-at (:element props)
-                  , focused-coord
+def treeview-component $ {} (:name :treeview)
+  :update-state merge
+  :get-state $ fn (props)
+    {} $ :pointer nil
+  :render $ fn (props)
+    fn (state)
+      let
+        (element $ :element props)
+          devtools-store $ :devtools-store props
+          focused-coord $ :focus (:state devtools-store)
 
-              ->> target-element
-                filter $ fn (entry)
-                  not= (key entry)
-                    , :children
+        [] :div
+          {} $ :style style-treeview
+          [] element-component $ {} (:element element)
+            :mount-point $ :mount-point props
+            :focused focused-coord
+          [] :div ({})
+            if (some? focused-coord)
+              let
+                (target-element $ get-element-at (:element props) (, focused-coord))
 
-                map $ fn (entry)
-                  [] (key entry)
-                    [] :div
-                      {} $ :style style-entry
-                      [] :div $ {} (:style style-key)
-                        :inner-text $ name $ key entry
-                      [] :div $ {} (:style style-value)
-                        :inner-text $ pr-str $ val entry
+                ->> target-element
+                  filter $ fn (entry)
+                    not= (key entry)
+                      , :children
 
-                into $ sorted-map
+                  map $ fn (entry)
+                    [] (key entry)
+                      [] :div
+                        {} $ :style style-entry
+                        [] :div $ {} (:style style-key)
+                          :inner-text $ name (key entry)
 
-        [] :div ({})
-          if (some? focused-coord)
-            [] :span $ {} $ :inner-text $ pr-str $ get (:states props)
-              , focused-coord
+                        [] :div $ {} (:style style-value)
+                          :inner-text $ pr-str (val entry)
 
-        let
-            rect $ :rect $ :state $ :devtools-store props
-          if (some? rect)
-            [] :div $ {} $ :style $ style-rect rect
+                  into $ sorted-map
+
+          [] :div ({})
+            if (some? focused-coord)
+              [] :span $ {}
+                :inner-text $ pr-str
+                  get (:states props)
+                    , focused-coord
+
+          let
+            (rect $ :rect (:state $ :devtools-store props))
+
+            if (some? rect)
+              [] :div $ {}
+                :style $ style-rect rect

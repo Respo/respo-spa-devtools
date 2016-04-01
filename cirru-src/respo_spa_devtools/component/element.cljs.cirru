@@ -1,10 +1,12 @@
 
-ns respo-spa-devtools.component.element $ :require $ [] hsl.core :refer $ [] hsl
+ns respo-spa-devtools.component.element $ :require
+  [] hsl.core :refer $ [] hsl
 
 defn style-element (focused?)
   {} (:display |flex)
     :align-items |flex-start
-    :box-shadow $ str "|0 -1px 0 " $ hsl 0 0 80
+    :box-shadow $ str "|0 -1px 0 "
+      hsl 0 0 80
     :background-color $ if focused?
       hsl 200 80 40 0.5
       , |transparent
@@ -27,14 +29,14 @@ def style-name $ {} (:font-family |Menlo)
   :height |auto
   :cursor |pointer
 
-def style-space $ {} $ :width |24px
+def style-space $ {} (:width |24px)
 
 def style-children $ {}
 
 defn handle-click (props state)
   fn (simple-event intent set-state)
     let
-        devtools-state $ :state props
+      (devtools-state $ :state props)
         element $ :element props
         store $ :store devtools-state
         mount-point $ :mount-point props
@@ -50,35 +52,41 @@ defn handle-click (props state)
         :focus $ :coord element
         :rect rect
 
-def element-component $ {} (:initial-state $ {})
-  :render $ fn (props state)
-    let
-        devtools-state $ :state props
-        element $ :element props
-        store $ :store props
-      [] :div
-        {} $ :style $ style-element $ = (:coord element)
-          :focused props
+def element-component $ {} (:name :element)
+  :update-state merge
+  :get-state $ fn (props)
+    {}
+  :render $ fn (props)
+    fn (state)
+      let
+        (devtools-state $ :state props)
+          element $ :element props
+          store $ :store props
         [] :div
-          {} $ :style style-info
-          if
-            some? $ :component-name element
-            [] :span $ {} (:style style-component)
-              :inner-text $ name $ :component-name element
+          {} $ :style
+            style-element $ = (:coord element)
+              :focused props
 
-          [] :span $ {} (:style style-name)
-            :inner-text $ name $ :name element
-            :on-click $ handle-click props state
+          [] :div
+            {} $ :style style-info
+            if
+              some? $ :c-name element
+              [] :span $ {} (:style style-component)
+                :inner-text $ name (:c-name element)
 
-        [] :div $ {} $ :style style-space
-        [] :div
-          {} $ :style style-children
-          ->> (:children element)
-            map $ fn (entry)
-              [] (key entry)
-                [] element-component $ {}
-                  :element $ val entry
-                  :focused $ :focused props
-                  :mount-point $ :mount-point props
+            [] :span $ {} (:style style-name)
+              :inner-text $ name (:name element)
+              :on-click $ handle-click props state
 
-            into $ sorted-map
+          [] :div $ {} (:style style-space)
+          [] :div
+            {} $ :style style-children
+            ->> (:children element)
+              map $ fn (entry)
+                [] (key entry)
+                  [] element-component $ {}
+                    :element $ val entry
+                    :focused $ :focused props
+                    :mount-point $ :mount-point props
+
+              into $ sorted-map

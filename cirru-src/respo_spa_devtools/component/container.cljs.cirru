@@ -6,7 +6,10 @@ ns respo-spa-devtools.component.container $ :require
 def style-container
 
 def container-component $ {} (:name :container)
-  :initial-state $ {}
-  :render $ fn (store state)
-    [] :div ({})
-      [] todolist-component store
+  :update-state merge
+  :get-state $ fn (store)
+    {}
+  :render $ fn (store)
+    fn (state)
+      [] :div ({})
+        [] todolist-component store

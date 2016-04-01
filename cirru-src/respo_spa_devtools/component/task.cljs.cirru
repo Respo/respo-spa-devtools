@@ -1,7 +1,8 @@
 
-ns respo-spa-devtools.component.task $ :require $ [] hsl.core :refer $ [] hsl
+ns respo-spa-devtools.component.task $ :require
+  [] hsl.core :refer $ [] hsl
 
-def style-task $ {} $ :display |flex
+def style-task $ {} (:display |flex)
 
 defn style-toggle (done?)
   {} (:width |32px)
@@ -37,20 +38,23 @@ defn handle-remove (task state)
   fn (simple-event intent set-state)
     intent :rm $ :id task
 
-def task-component $ {}
-  :initial-state $ {} $ :draft |
-  :name :task
-  :render $ fn (task state)
-    [] :div
-      {} $ :style style-task
-      [] :div $ {}
-        :on-click $ handle-toggle task state
-        :style $ style-toggle $ :done? task
-      [] :input $ {}
-        :on-change $ handle-change task state
-        :value $ :text task
-        :style style-input
-        :placeholder "|Describe the task"
-      [] :div $ {}
-        :on-click $ handle-remove task state
-        :style style-remove
+def task-component $ {} (:name :task)
+  :update-state merge
+  :get-state $ fn (task)
+    {} $ :draft |
+  :render $ fn (task)
+    fn (state)
+      [] :div
+        {} $ :style style-task
+        [] :div $ {}
+          :on-click $ handle-toggle task state
+          :style $ style-toggle (:done? task)
+
+        [] :input $ {}
+          :on-change $ handle-change task state
+          :value $ :text task
+          :style style-input
+          :placeholder "|Describe the task"
+        [] :div $ {}
+          :on-click $ handle-remove task state
+          :style style-remove

@@ -14,7 +14,9 @@ defn style-devtools (style)
       :background-color $ hsl 200 0 100
       :font-size |12px
       :transition-duration |200ms
-      :box-shadow $ str "|0 0 1px " $ hsl 0 0 30 0.5
+      :box-shadow $ str "|0 0 1px "
+        hsl 0 0 30 0.5
+
     , style
 
 def style-header $ {}
@@ -30,37 +32,46 @@ defn style-tab (selected?)
     :line-height |32px
     :cursor |pointer
 
-def style-content $ {} $ :background-color $ hsl 80 80 100
+def style-content $ {}
+  :background-color $ hsl 80 80 100
 
 defn select-tab (target)
   fn (simple-event intent set-state)
-    set-state $ {} $ :tab target
+    set-state $ {} (:tab target)
 
-def devtools-component $ {}
-  :initial-state $ {} $ :tab :elements
-  :render $ fn (props state)
-    if (:visible? props)
-      [] :div
-        {} $ :style $ style-devtools $ :style props
+def devtools-component $ {} (:name :devtools)
+  :update-state merge
+  :get-state $ fn (props)
+    {} $ :tab :elements
+  :render $ fn (props)
+    fn (state)
+      if (:visible? props)
         [] :div
-          {} $ :style style-header
-          [] :span $ {}
-            :style $ style-tab $ = (:tab state)
-              , :elements
-            :inner-text |Elements
-            :on-click $ select-tab :elements
+          {} $ :style
+            style-devtools $ :style props
+          [] :div
+            {} $ :style style-header
+            [] :span $ {}
+              :style $ style-tab
+                = (:tab state)
+                  , :elements
 
-          [] :span $ {}
-            :style $ style-tab $ = (:tab state)
-              , :store
-            :inner-text |Store
-            :on-click $ select-tab :store
+              :inner-text |Elements
+              :on-click $ select-tab :elements
 
-        [] :section
-          {} $ :style style-content
-          case (:tab state)
-            :elements $ [] treeview-component props
-            :store $ [] player-component props
-            [] :span $ {} $ :inner-text "|Nothing Selected"
+            [] :span $ {}
+              :style $ style-tab
+                = (:tab state)
+                  , :store
 
-      [] :noscript $ {}
+              :inner-text |Store
+              :on-click $ select-tab :store
+
+          [] :section
+            {} $ :style style-content
+            case (:tab state)
+              :elements $ [] treeview-component props
+              :store $ [] player-component props
+              [] :span $ {} (:inner-text "|Nothing Selected")
+
+        [] :noscript $ {}

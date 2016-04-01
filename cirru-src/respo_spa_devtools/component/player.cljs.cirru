@@ -17,16 +17,21 @@ def style-body $ {}
 def style-records $ {} (:width |240px)
   :margin-right |16px
   :overflow-y |auto
+  :flex-shrink |0
+  :flex-grow |0
 
 defn style-records-list (n)
   {}
     :height $ str (* 24 n)
       , |px
     :position |relative
+    :transition-duration |200ms
 
-defn style-record (index)
+defn style-record (index selected?)
   {} (:font-family "|Source code pro, menlo, monospace")
-    :background-color $ hsl 120 70 70
+    :background-color $ if selected?
+      hsl 120 80 80
+      hsl 120 70 70
     :padding "|0 8px"
     :line-height |24px
     :color |white
@@ -59,13 +64,18 @@ def style-button $ {} (:padding "|0 8px")
   :display |inline-block
   :cursor |pointer
 
-def style-initial $ {} (:font-family "|Source code pro, menlo")
-  :font-size |12px
-  :padding "|0 8px"
-  :color |white
-  :line-height |24px
-  :cursor |pointer
-  :background-color $ hsl 170 80 60
+defn style-initial (selected?)
+  {} (:font-family "|Source code pro, menlo")
+    :font-size |12px
+    :padding "|0 8px"
+    :color |white
+    :line-height |24px
+    :cursor |pointer
+    :background-color $ if selected?
+      hsl 120 80 80
+      hsl 120 70 70
+
+def style-text-only $ {} (:pointer-events |none)
 
 defn select-tab (tab)
   fn (simple-event dispatch mutate)
@@ -73,10 +83,22 @@ defn select-tab (tab)
 
 defn select-record (index)
   fn (simple-event dispatch mutate)
-    .info js/console |selecting: index
+    dispatch :visit index
 
 defn select-initial (simple-event dispatch mutate)
-  .log js/console "|select initial"
+  dispatch :visit 0
+
+defn do-commit (simple-event dispatch mutate)
+  dispatch :commit
+
+defn do-reset (simple-event dispatch mutate)
+  dispatch :reset
+
+defn do-step (simple-event dispatch mutate)
+  dispatch :step
+
+defn do-run (simple-event dispatch mutate)
+  dispatch :run
 
 def player-component $ {} (:name :player)
   :update-state $ fn (old-state new-state)
@@ -90,6 +112,7 @@ def player-component $ {} (:name :player)
           store $ :store recorder
           changes $ :changes recorder
           initial-store $ :initial recorder
+          pointer $ :pointer recorder
         [] :nav
           {} $ :style style-player
           [] :div
@@ -103,16 +126,25 @@ def player-component $ {} (:name :player)
                     [] :div
                       {}
                         :style $ style-record index
-                        :on-click $ select-record index
-                      [] :span $ {}
+                          = pointer $ - (count records)
+                            , index
+
+                        :on-click $ select-record
+                          - (count records)
+                            , index
+
+                      [] :span $ {} (:style style-text-only)
                         :inner-text $ first record
 
                 into $ sorted-map
 
             [] :div
-              {} (:style style-initial)
+              {}
+                :style $ style-initial (= pointer 0)
                 :on-click select-initial
+
               [] :span $ {} (:inner-text |initial)
+                :style style-text-only
 
           [] :div
             {} $ :style style-box
@@ -120,10 +152,16 @@ def player-component $ {} (:name :player)
               {} $ :style style-toolbar
               [] :span $ {} (:style style-button)
                 :inner-text |commit
+                :on-click do-commit
               [] :span $ {} (:style style-button)
                 :inner-text |reset
+                :on-click do-reset
               [] :span $ {} (:style style-button)
                 :inner-text |step
+                :on-click do-step
+              [] :span $ {} (:style style-button)
+                :inner-text |run
+                :on-click do-run
 
             [] :div
               {} $ :style style-header
@@ -134,12 +172,12 @@ def player-component $ {} (:name :player)
                 :on-click $ select-tab :changes
                 :inner-text |changes
               [] :span $ {} (:style style-tab)
-                :on-click $ select-tab :initial
-                :inner-text |initial
+                :on-click $ select-tab :action
+                :inner-text |action
 
             [] :div
               {} $ :style style-body
               render-value $ case tab (:store store)
                 :changes changes
-                :initial initial-store
+                :action $ get records pointer
                 , nil

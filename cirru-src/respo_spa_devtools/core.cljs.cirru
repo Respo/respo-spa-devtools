@@ -105,7 +105,6 @@ defn rerender-app ()
         purify-element @global-devtools-element
         purify-element devtools-element
 
-    .info js/console |Changes: changes
     patch-instance changes app-root deliver-event
     reset! global-element element
     patch-instance devtools-changes devtools-root devtools-deliver-event

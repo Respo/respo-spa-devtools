@@ -1,5 +1,6 @@
 
-ns respo-spa-devtools.updater.recorder $ :require $ [] respo-spa-devtools.schema :as schema
+ns respo-spa-devtools.updater.recorder $ :require
+  [] respo-spa-devtools.schema :as schema
 
 defn regenerate-store (initial-store updater records)
   if
@@ -8,7 +9,7 @@ defn regenerate-store (initial-store updater records)
     , initial-store
     recur
       let
-          action $ last records
+        (action $ last records)
           action-type $ get action 0
           action-data $ get action 1
           action-id $ get action 2
@@ -21,8 +22,10 @@ defn regenerate-store (initial-store updater records)
 defn update-recorder
   old-recorder updater op-type op-data op-id
   case op-type
-    :state $ update old-recorder :state $ fn (old-state)
-      merge old-state op-data
+    :state $ update old-recorder :state
+      fn (old-state)
+        merge old-state op-data
+
     :record $ if (:visiting? old-recorder)
       update old-recorder :records $ fn (records)
         conj records op-data
@@ -33,6 +36,7 @@ defn update-recorder
           get op-data 0
           get op-data 1
           get op-data 2
+        update :pointer inc
 
     :commit $ -> old-recorder
       assoc :initial $ :store old-recorder
@@ -48,18 +52,18 @@ defn update-recorder
       assoc :store $ :initial old-recorder
     :visit $ if (= op-data 0)
       -> old-recorder (assoc :pointer 0)
-        assoc :visiting true
+        assoc :visiting? true
         assoc :store $ :initial old-recorder
         assoc :diff nil
       -> old-recorder (assoc :pointer op-data)
-        assoc :visiting true
+        assoc :visiting? true
         assoc :store $ regenerate-store (:initial old-recorder)
           , updater
           subvec (:records old-recorder)
             , 0 op-data
 
     :run $ -> old-recorder (assoc :visiting? false)
-      assoc :pointer 0
+      assoc :pointer $ count (:records old-recorder)
       assoc :store $ regenerate-store (:initial old-recorder)
         , updater
         :records old-recorder

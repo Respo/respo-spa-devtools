@@ -52,9 +52,12 @@
    [:body {:style "margin: 0;"}
     [:div#app] [:div#devtools] [:script {:src "main.js"}]]])
 
+(deftask compile-cirru []
+  (cirru-sepal :paths ["cirru-src"]))
+
 (deftask build-simple []
   (comp
-    (cirru-sepal :paths ["cirru-src"])
+    (compile-cirru)
     (cljs)
     (html-entry :dsl (html-dsl {:env :dev}) :html-name "index.html")))
 
@@ -67,28 +70,29 @@
     (cljs)))
 
 (deftask build-advanced []
-    (comp
-        (cljs :optimizations :advanced)
-        (html-entry :dsl (html-dsl {:env :build}) :html-name "index.html")))
+  (comp
+    (compile-cirru)
+      (cljs :optimizations :advanced)
+      (html-entry :dsl (html-dsl {:env :build}) :html-name "index.html")))
 
 (deftask rsync []
   (fn [next-task]
     (fn [fileset]
-        (sh "rsync" "-r" "target/" "tiye:repo/mvc-works/respo-spa-devtools" "--exclude" "main.out" "--delete")
-        (next-task fileset))))
+      (sh "rsync" "-r" "target/" "tiye:repo/mvc-works/respo-spa-devtools" "--exclude" "main.out" "--delete")
+      (next-task fileset))))
 
 (deftask send-tiye []
-    (comp
-        (build-advanced)
-        (rsync)))
+  (comp
+    (build-advanced)
+    (rsync)))
 
 (deftask build []
   (comp
-   (pom)
-   (jar)
-   (install)))
+    (pom)
+    (jar)
+    (install)))
 
 (deftask deploy []
   (comp
-   (build)
-   (push :repo "clojars" :gpg-sign (not (.endsWith +version+ "-SNAPSHOT")))))
+    (build)
+    (push :repo "clojars" :gpg-sign (not (.endsWith +version+ "-SNAPSHOT")))))

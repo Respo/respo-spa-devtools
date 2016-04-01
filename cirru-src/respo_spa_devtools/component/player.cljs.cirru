@@ -49,7 +49,7 @@ def player-component $ {} (:name :player)
           store $ :store recorder
           changes $ :changes recorder
           initial-store $ :initial recorder
-        [] :div
+        [] :nav
           {} $ :style style-player
           [] :div
             {} $ :style style-records

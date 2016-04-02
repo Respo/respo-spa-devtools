@@ -55,25 +55,28 @@
 (deftask compile-cirru []
   (cirru-sepal :paths ["cirru-src"]))
 
-(deftask build-simple []
-  (comp
-    (compile-cirru)
-    (cljs)
-    (html-entry :dsl (html-dsl {:env :dev}) :html-name "index.html")))
-
 (deftask dev []
   (comp
     (html-entry :dsl (html-dsl {:env :dev}) :html-name "index.html")
     (cirru-sepal :paths ["cirru-src"] :watch true)
     (watch)
     (reload :on-jsload 'respo-spa-devtools.core/on-jsload)
-    (cljs)))
+    (cljs)
+    (target)))
+
+(deftask build-simple []
+  (comp
+    (compile-cirru)
+    (cljs :optimizations :simple)
+    (html-entry :dsl (html-dsl {:env :dev}) :html-name "index.html")
+    (target)))
 
 (deftask build-advanced []
   (comp
     (compile-cirru)
-      (cljs :optimizations :advanced)
-      (html-entry :dsl (html-dsl {:env :build}) :html-name "index.html")))
+    (cljs :optimizations :advanced)
+    (html-entry :dsl (html-dsl {:env :build}) :html-name "index.html")
+    (target)))
 
 (deftask rsync []
   (fn [next-task]
@@ -83,11 +86,12 @@
 
 (deftask send-tiye []
   (comp
-    (build-advanced)
+    (build-simple)
     (rsync)))
 
 (deftask build []
   (comp
+    (compile-cirru)
     (pom)
     (jar)
     (install)))

@@ -37,8 +37,8 @@ defn style-tab (selected?)
 def style-content $ {}
   :background-color $ hsl 80 80 100
 
-defn select-tab (target)
-  fn (simple-event dispatch mutate)
+defn select-tab (mutate target)
+  fn (simple-event dispatch)
     mutate $ {} (:tab target)
 
 def devtools-component $ create-comp :devtools
@@ -58,16 +58,16 @@ def devtools-component $ create-comp :devtools
                 = (:tab state)
                   , :elements
 
-              :inner-text |Elements
-              :on-click $ select-tab :elements
+              :attrs $ {} :inner-text |Elements
+              :event $ {} :click (select-tab mutate :elements)
 
             span $ {}
               :style $ style-tab
                 = (:tab state)
                   , :store
 
-              :inner-text |Store
-              :on-click $ select-tab :store
+              :attrs $ {} :inner-text |Store
+              :event $ {} :click (select-tab mutate :store)
 
           div
             {} $ :style style-content

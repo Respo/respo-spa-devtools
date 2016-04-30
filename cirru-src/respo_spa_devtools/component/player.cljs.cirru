@@ -78,8 +78,8 @@ defn style-initial (selected?)
 
 def style-text-only $ {} (:pointer-events |none)
 
-defn select-tab (tab)
-  fn (simple-event dispatch mutate)
+defn select-tab (mutate tab)
+  fn (simple-event dispatch)
     mutate tab
 
 defn select-record (index)
@@ -130,12 +130,12 @@ def player-component $ create-comp :player
                           = pointer $ - (count records)
                             , index
 
-                        :on-click $ select-record
-                          - (count records)
+                        :event $ {} :click
+                          select-record $ - (count records)
                             , index
 
                       span $ {} (:style style-text-only)
-                        :inner-text $ first record
+                        :attrs $ {} :inner-text (first record)
 
                 into $ sorted-map
 
@@ -152,33 +152,35 @@ def player-component $ create-comp :player
             div
               {} $ :style style-toolbar
               span $ {} (:style style-button)
-                :inner-text |commit
-                :on-click do-commit
+                :attrs $ {} :inner-text |commit
+                :event $ {} :click do-commit
               span $ {} (:style style-button)
-                :inner-text |reset
-                :on-click do-reset
+                :attrs $ {} :inner-text |reset
+                :event $ {} :click do-reset
               span $ {} (:style style-button)
-                :inner-text |step
-                :on-click do-step
+                :attrs $ {} :inner-text |step
+                :event $ {} :click do-step
               span $ {} (:style style-button)
-                :inner-text |run
-                :on-click do-run
+                :attrs $ {} :inner-text |run
+                :event $ {} :click do-run
 
             div
               {} $ :style style-header
               span $ {} (:style style-tab)
-                :on-click $ select-tab :store
-                :inner-text |store
+                :event $ {} :click (select-tab mutate :store)
+                :attrs $ {} :inner-text |store
+
               span $ {} (:style style-tab)
-                :on-click $ select-tab :changes
-                :inner-text |changes
+                :event $ {} :click (select-tab mutate :changes)
+                :attrs $ {} :inner-text |changes
+
               span $ {} (:style style-tab)
-                :on-click $ select-tab :action
-                :inner-text |action
+                :event $ {} :click (select-tab mutate :action)
+                :attrs $ {} :inner-text |action
 
             div
               {} $ :style style-body
               render-value $ case tab (:store store)
                 :changes changes
-                :action $ get records pointer
+                :action $ get records (dec pointer)
                 , nil

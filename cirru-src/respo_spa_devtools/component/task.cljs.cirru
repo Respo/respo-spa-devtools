@@ -57,7 +57,7 @@ def task-component $ create-comp :task
           :style $ style-toggle (:done? task)
 
         input $ {} :style style-input :event
-          :change $ handle-change task state
+          {} :change $ handle-change task state
           , :attrs
           {} :value (:text task)
             , :placeholder "|Describe the task"

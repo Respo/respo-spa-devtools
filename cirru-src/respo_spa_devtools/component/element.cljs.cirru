@@ -1,7 +1,7 @@
 
 ns respo-spa-devtools.component.element $ :require
   [] hsl.core :refer $ [] hsl
-  [] respo.alias :refer $ [] create-comp div span
+  [] respo.alias :refer $ [] create-comp div span Component
 
 defn style-element (focused?)
   {} (:display |flex)
@@ -53,11 +53,11 @@ defn handle-click (props state)
         :focus $ :coord element
         :rect rect
 
-def element-component $ {} (:name :element)
-  :update-state merge
-  :get-state $ fn (props)
+def element-component $ create-comp :element
+  fn (props)
     {}
-  :render $ fn (props)
+  , merge
+  fn (props)
     fn (state)
       let
         (devtools-state $ :state props)
@@ -68,26 +68,35 @@ def element-component $ {} (:name :element)
             style-element $ = (:coord element)
               :focused props
 
-          div
-            {} $ :style style-info
+          div ({} :style style-info)
             if
-              some? $ :c-name element
+              = Component $ type element
               span $ {} (:style style-component)
-                :inner-text $ name (:c-name element)
+                :attrs $ {} :inner-text
+                  name $ :name element
 
-            span $ {} (:style style-name)
-              :inner-text $ name (:name element)
-              :on-click $ handle-click props state
+              span $ {} (:style style-name)
+                :attrs $ {} :inner-text
+                  name $ :name element
+                :event $ {} :click (handle-click props state)
 
           div $ {} (:style style-space)
-          div
-            {} $ :style style-children
-            ->> (:children element)
-              map $ fn (entry)
-                [] (key entry)
-                  [] element-component $ {}
-                    :element $ val entry
-                    :focused $ :focused props
-                    :mount-point $ :mount-point props
+          if
+            = Component $ type element
+            div ({} :style style-children)
+              element-component $ {}
+                :element $ :tree element
+                :focused $ :focused props
+                :mount-point $ :mount-point props
 
-              into $ sorted-map
+            div
+              {} $ :style style-children
+              ->> (:children element)
+                map $ fn (entry)
+                  [] (key entry)
+                    element-component $ {}
+                      :element $ val entry
+                      :focused $ :focused props
+                      :mount-point $ :mount-point props
+
+                into $ sorted-map

@@ -34,11 +34,11 @@ defn render-element ()
       , @global-states build-mutate
 
 defn render-devtools-element ()
-  .info js/console "|render devtools" @devtools-states
+  -- .info js/console "|devtools states:" @devtools-states
+  .info js/console "|devtools Store:" $ :state @devtools-store
   let
     (app-element $ render-element)
       build-mutate $ mutate-factory global-devtools-element devtools-states
-    .log js/console @devtools-store
     render-app
       devtools-component $ {} (:element app-element)
         :devtools-store @devtools-store
@@ -70,25 +70,19 @@ defn get-root ()
 defn get-devtools-root ()
   .querySelector js/document |#devtools
 
-declare rerender-app
-
-defn get-deliver-event ()
-  build-deliver-event global-element dispatch
-
-defn get-devtools-deliver-event ()
-  build-deliver-event global-devtools-element devtools-dispatch
-
 defn mount-app ()
   let
     (element $ render-element) (app-root $ get-root)
-      deliver-event $ get-deliver-event
-      devtools-element $ render-devtools-element
-      devtools-root $ get-devtools-root
-      devtools-deliver-event $ get-devtools-deliver-event
+      deliver-event $ build-deliver-event global-element dispatch
     initialize-instance app-root deliver-event
     activate-instance (purify-element element)
       , app-root deliver-event
     reset! global-element element
+
+defn mount-devtools ()
+  let
+    (devtools-element $ render-devtools-element) (devtools-root $ get-devtools-root)
+      devtools-deliver-event $ build-deliver-event global-devtools-element devtools-dispatch
     initialize-instance devtools-root devtools-deliver-event
     activate-instance (purify-element devtools-element)
       , devtools-root devtools-deliver-event
@@ -97,21 +91,24 @@ defn mount-app ()
 defn rerender-app ()
   let
     (element $ render-element) (app-root $ get-root)
-      deliver-event $ get-deliver-event
+      deliver-event $ build-deliver-event global-element dispatch
       changes $ find-element-diffs ([])
         []
         purify-element @global-element
         purify-element element
-      devtools-element $ render-devtools-element
-      devtools-root $ get-devtools-root
-      devtools-deliver-event $ get-devtools-deliver-event
+
+    patch-instance changes app-root deliver-event
+    reset! global-element element
+
+defn rerender-devtools ()
+  let
+    (devtools-element $ render-devtools-element) (devtools-root $ get-devtools-root)
+      devtools-deliver-event $ build-deliver-event global-devtools-element devtools-dispatch
       devtools-changes $ find-element-diffs ([])
         []
         purify-element @global-devtools-element
         purify-element devtools-element
 
-    patch-instance changes app-root deliver-event
-    reset! global-element element
     patch-instance devtools-changes devtools-root devtools-deliver-event
     reset! global-devtools-element devtools-element
 
@@ -120,20 +117,30 @@ defn -main ()
   devtools/install!
   .info js/console "|App started"
   mount-app
-  add-watch global-states :rerender rerender-app
-  add-watch devtools-store :rerender rerender-app
-  add-watch devtools-states :renderer rerender-app
+  mount-devtools
+  add-watch global-states :rerender $ fn ()
+    do (rerender-app)
+      rerender-devtools
+
+  add-watch devtools-store :rerender $ fn ()
+    do (rerender-app)
+      rerender-devtools
+
+  add-watch devtools-states :renderer $ fn ()
+    do (rerender-app)
+      rerender-devtools
 
 defn listen-context-menu (event)
-  .log js/console event.target
   let
     (click-target $ .-target event)
       coord $ -> click-target .-dataset .-coord
     if (string? coord)
       do (.preventDefault event)
-        swap! devtools-store assoc :focus (read-string coord)
-          , :rect
-          .getBoundingClientRect click-target
+        .log js/console "|doing swap" @devtools-store
+        swap! devtools-store update :state $ fn (state)
+          assoc state :focus (read-string coord)
+            , :rect
+            .getBoundingClientRect click-target
 
 set! (.-onload js/window)
   , -main

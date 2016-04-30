@@ -3,6 +3,7 @@ ns respo-spa-devtools.component.devtools $ :require
   [] hsl.core :refer $ hsl
   [] respo-spa-devtools.component.player :refer $ [] player-component
   [] respo-spa-devtools.component.treeview :refer $ [] treeview-component
+  [] respo.alias :refer $ [] create-comp div span
 
 defn style-devtools (style)
   merge
@@ -40,19 +41,19 @@ defn select-tab (target)
   fn (simple-event dispatch mutate)
     mutate $ {} (:tab target)
 
-def devtools-component $ {} (:name :devtools)
-  :update-state merge
-  :get-state $ fn (props)
+def devtools-component $ create-comp :devtools
+  fn (props)
     {} $ :tab :elements
-  :render $ fn (props)
-    fn (state)
+  , merge
+  fn (props)
+    fn (state mutate)
       if (:visible? props)
-        [] :div
+        div
           {} $ :style
             style-devtools $ :style props
-          [] :div
+          div
             {} $ :style style-header
-            [] :span $ {}
+            span $ {}
               :style $ style-tab
                 = (:tab state)
                   , :elements
@@ -60,7 +61,7 @@ def devtools-component $ {} (:name :devtools)
               :inner-text |Elements
               :on-click $ select-tab :elements
 
-            [] :span $ {}
+            span $ {}
               :style $ style-tab
                 = (:tab state)
                   , :store
@@ -68,11 +69,11 @@ def devtools-component $ {} (:name :devtools)
               :inner-text |Store
               :on-click $ select-tab :store
 
-          [] :section
+          div
             {} $ :style style-content
             case (:tab state)
-              :elements $ [] treeview-component props
-              :store $ [] player-component (:devtools-store props)
-              [] :span $ {} (:inner-text "|Nothing Selected")
+              :elements $ treeview-component props
+              :store $ player-component (:devtools-store props)
+              span $ {} (:inner-text "|Nothing Selected")
 
-        [] :noscript $ {}
+        , nil

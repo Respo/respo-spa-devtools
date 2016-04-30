@@ -1,7 +1,7 @@
 
 ns respo-spa-devtools.core $ :require
   [] respo.renderer.expander :refer $ [] render-app
-  [] respo.controller.deliver :refer $ [] build-deliver-event
+  [] respo.controller.deliver :refer $ [] build-deliver-event mutate-factory
   [] respo.renderer.differ :refer $ [] find-element-diffs
   [] respo.util.format :refer $ [] purify-element
   [] respo-client.controller.client :refer $ [] initialize-instance activate-instance patch-instance
@@ -27,17 +27,20 @@ defonce devtools-states $ atom ({})
 defonce global-devtools-element $ atom nil
 
 defn render-element ()
-  render-app
-    [] container-component $ :store @devtools-store
-    , @global-states
+  let
+    (build-mutate $ mutate-factory global-element global-states)
+    render-app
+      container-component $ :store @devtools-store
+      , @global-states build-mutate
 
 defn render-devtools-element ()
   .info js/console "|render devtools" @devtools-states
   let
     (app-element $ render-element)
+      build-mutate $ mutate-factory global-devtools-element devtools-states
     .log js/console @devtools-store
     render-app
-      [] devtools-component $ {} (:element app-element)
+      devtools-component $ {} (:element app-element)
         :devtools-store @devtools-store
         :store $ :store @devtools-store
         :style $ {} (:top |200px)
@@ -47,7 +50,7 @@ defn render-devtools-element ()
         :visible? true
         :mount-point |#app
 
-      , @devtools-states
+      , @devtools-states build-mutate
 
 defn devtools-dispatch (op-type op-data)
   .info js/console "|DevTools dispatch:" op-type op-data
@@ -70,10 +73,10 @@ defn get-devtools-root ()
 declare rerender-app
 
 defn get-deliver-event ()
-  build-deliver-event global-element dispatch global-states
+  build-deliver-event global-element dispatch
 
 defn get-devtools-deliver-event ()
-  build-deliver-event global-devtools-element devtools-dispatch devtools-states
+  build-deliver-event global-devtools-element devtools-dispatch
 
 defn mount-app ()
   let
@@ -83,10 +86,12 @@ defn mount-app ()
       devtools-root $ get-devtools-root
       devtools-deliver-event $ get-devtools-deliver-event
     initialize-instance app-root deliver-event
-    activate-instance element app-root deliver-event
+    activate-instance (purify-element element)
+      , app-root deliver-event
     reset! global-element element
     initialize-instance devtools-root devtools-deliver-event
-    activate-instance devtools-element devtools-root devtools-deliver-event
+    activate-instance (purify-element devtools-element)
+      , devtools-root devtools-deliver-event
     reset! global-devtools-element devtools-element
 
 defn rerender-app ()

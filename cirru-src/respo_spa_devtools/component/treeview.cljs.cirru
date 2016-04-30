@@ -2,8 +2,9 @@
 ns respo-spa-devtools.component.treeview $ :require
   [] hsl.core :refer $ [] hsl
   [] respo-spa-devtools.component.element :refer $ [] element-component
-  [] respo.controller.resolver :refer $ [] get-element-at
+  [] respo.controller.resolver :refer $ [] get-markup-at
   [] respo-value.component.value :refer $ [] render-value
+  [] respo.alias :refer $ [] create-comp div
 
 def style-treeview $ {} (:display |flex)
 
@@ -32,26 +33,26 @@ defn style-rect (rect)
     :z-index |999
     :pointer-events |none
 
-def treeview-component $ {} (:name :treeview)
-  :update-state merge
-  :get-state $ fn (props)
+def treeview-component $ create-comp :treeview
+  fn (props)
     {} $ :pointer nil
-  :render $ fn (props)
-    fn (state)
+  , merge
+  fn (props)
+    fn (state mutate)
       let
         (element $ :element props)
           devtools-store $ :devtools-store props
           focused-coord $ :focus (:state devtools-store)
 
-        [] :div
+        div
           {} $ :style style-treeview
-          [] element-component $ {} (:element element)
+          element-component $ {} (:element element)
             :mount-point $ :mount-point props
             :focused focused-coord
-          [] :div ({})
+          div ({})
             if (some? focused-coord)
               let
-                (target-element $ get-element-at (:element props) (, focused-coord))
+                (target-element $ get-markup-at (:element props) (, focused-coord))
 
                 ->> target-element
                   filter $ fn (entry)
@@ -61,12 +62,12 @@ def treeview-component $ {} (:name :treeview)
                   reverse
                   map $ fn (entry)
                     [] (key entry)
-                      [] :div
+                      div
                         {} $ :style style-entry
-                        [] :div
+                        div
                           {} $ :style style-key
                           render-value $ key entry
-                        [] :div
+                        div
                           {} $ :style style-value
                           render-value $ val entry
 
@@ -76,5 +77,5 @@ def treeview-component $ {} (:name :treeview)
             (rect $ :rect (:state $ :devtools-store props))
 
             if (some? rect)
-              [] :div $ {}
+              div $ {}
                 :style $ style-rect rect

@@ -1,6 +1,7 @@
 
 ns respo-spa-devtools.component.task $ :require
   [] hsl.core :refer $ [] hsl
+  [] respo.alias :refer $ [] create-comp div input
 
 def style-task $ {} (:display |flex)
   :width |100%
@@ -30,11 +31,11 @@ def style-remove $ {} (:width |32px)
   :cursor |pointer
 
 defn handle-toggle (task state)
-  fn (simple-event dispatch mutate)
+  fn (simple-event dispatch)
     dispatch :toggle $ :id task
 
 defn handle-change (task state)
-  fn (simple-event dispatch mutate)
+  fn (simple-event dispatch)
     dispatch :update $ {}
       :id $ :id task
       :text $ :value simple-event
@@ -43,23 +44,24 @@ defn handle-remove (task state)
   fn (simple-event dispatch mutate)
     dispatch :rm $ :id task
 
-def task-component $ {} (:name :task)
-  :update-state merge
-  :get-state $ fn (task)
+def task-component $ create-comp :task
+  fn (task)
     {} $ :draft |
-  :render $ fn (task)
-    fn (state)
-      [] :div
+  , merge
+  fn (task)
+    fn (state mutate)
+      div
         {} $ :style style-task
-        [] :div $ {}
-          :on-click $ handle-toggle task state
+        div $ {}
+          :event $ {} :click (handle-toggle task state)
           :style $ style-toggle (:done? task)
 
-        [] :input $ {}
-          :on-change $ handle-change task state
-          :value $ :text task
-          :style style-input
-          :placeholder "|Describe the task"
-        [] :div $ {}
-          :on-click $ handle-remove task state
+        input $ {} :style style-input :event
+          :change $ handle-change task state
+          , :attrs
+          {} :value (:text task)
+            , :placeholder "|Describe the task"
+
+        div $ {}
+          :event $ {} :click (handle-remove task state)
           :style style-remove

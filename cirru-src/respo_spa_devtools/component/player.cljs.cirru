@@ -2,6 +2,7 @@
 ns respo-spa-devtools.component.player $ :require
   [] hsl.core :refer $ [] hsl
   [] respo-value.component.value :refer $ render-value
+  [] respo.alias :refer $ [] create-comp div span
 
 def style-player $ {} (:display |flex)
   :flex-direction |row
@@ -100,30 +101,30 @@ defn do-step (simple-event dispatch mutate)
 defn do-run (simple-event dispatch mutate)
   dispatch :run
 
-def player-component $ {} (:name :player)
-  :update-state $ fn (old-state new-state)
-    , new-state
-  :get-state $ fn (recorder)
+def player-component $ create-comp :player
+  fn (recorder)
     , :store
-  :render $ fn (recorder)
-    fn (tab)
+  fn (old-state new-state)
+    , new-state
+  fn (recorder)
+    fn (tab mutate)
       let
         (records $ :records recorder)
           store $ :store recorder
           changes $ :changes recorder
           initial-store $ :initial recorder
           pointer $ :pointer recorder
-        [] :nav
+        div
           {} $ :style style-player
-          [] :div
+          div
             {} $ :style style-records
-            [] :div
+            div
               {} $ :style
                 style-records-list $ count records
               ->> records (reverse)
                 map-indexed $ fn (index record)
                   [] (last record)
-                    [] :div
+                    div
                       {}
                         :style $ style-record index
                           = pointer $ - (count records)
@@ -133,49 +134,49 @@ def player-component $ {} (:name :player)
                           - (count records)
                             , index
 
-                      [] :span $ {} (:style style-text-only)
+                      span $ {} (:style style-text-only)
                         :inner-text $ first record
 
                 into $ sorted-map
 
-            [] :div
+            div
               {}
                 :style $ style-initial (= pointer 0)
                 :on-click select-initial
 
-              [] :span $ {} (:inner-text |initial)
+              span $ {} (:inner-text |initial)
                 :style style-text-only
 
-          [] :div
+          div
             {} $ :style style-box
-            [] :div
+            div
               {} $ :style style-toolbar
-              [] :span $ {} (:style style-button)
+              span $ {} (:style style-button)
                 :inner-text |commit
                 :on-click do-commit
-              [] :span $ {} (:style style-button)
+              span $ {} (:style style-button)
                 :inner-text |reset
                 :on-click do-reset
-              [] :span $ {} (:style style-button)
+              span $ {} (:style style-button)
                 :inner-text |step
                 :on-click do-step
-              [] :span $ {} (:style style-button)
+              span $ {} (:style style-button)
                 :inner-text |run
                 :on-click do-run
 
-            [] :div
+            div
               {} $ :style style-header
-              [] :span $ {} (:style style-tab)
+              span $ {} (:style style-tab)
                 :on-click $ select-tab :store
                 :inner-text |store
-              [] :span $ {} (:style style-tab)
+              span $ {} (:style style-tab)
                 :on-click $ select-tab :changes
                 :inner-text |changes
-              [] :span $ {} (:style style-tab)
+              span $ {} (:style style-tab)
                 :on-click $ select-tab :action
                 :inner-text |action
 
-            [] :div
+            div
               {} $ :style style-body
               render-value $ case tab (:store store)
                 :changes changes

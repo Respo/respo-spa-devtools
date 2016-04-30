@@ -1,6 +1,7 @@
 
 ns respo-spa-devtools.component.element $ :require
   [] hsl.core :refer $ [] hsl
+  [] respo.alias :refer $ [] create-comp div span
 
 defn style-element (focused?)
   {} (:display |flex)
@@ -62,24 +63,24 @@ def element-component $ {} (:name :element)
         (devtools-state $ :state props)
           element $ :element props
           store $ :store props
-        [] :div
+        div
           {} $ :style
             style-element $ = (:coord element)
               :focused props
 
-          [] :div
+          div
             {} $ :style style-info
             if
               some? $ :c-name element
-              [] :span $ {} (:style style-component)
+              span $ {} (:style style-component)
                 :inner-text $ name (:c-name element)
 
-            [] :span $ {} (:style style-name)
+            span $ {} (:style style-name)
               :inner-text $ name (:name element)
               :on-click $ handle-click props state
 
-          [] :div $ {} (:style style-space)
-          [] :div
+          div $ {} (:style style-space)
+          div
             {} $ :style style-children
             ->> (:children element)
               map $ fn (entry)

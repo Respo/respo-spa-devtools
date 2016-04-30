@@ -9,12 +9,12 @@
                  [adzerk/boot-cljs "1.7.170-3"      :scope "test"]
                  [adzerk/boot-reload "0.4.6"        :scope "test"]
                  [mvc-works/boot-html-entry "0.1.1" :scope "test"]
-                 [cirru/boot-cirru-sepal "0.1.1"    :scope "test"]
+                 [cirru/boot-cirru-sepal "0.1.2"    :scope "test"]
                  [binaryage/devtools "0.5.2"        :scope "test"]
                  [org.clojure/core.async "0.2.374"  :scope "test"]
-                 [mvc-works/respo "0.1.10"          :scope "test"]
-                 [mvc-works/respo-client "0.1.9"    :scope "test"]
-                 [mvc-works/respo-value "0.1.1"]
+                 [mvc-works/respo "0.1.18"]
+                 [mvc-works/respo-client "0.1.11"]
+                 [mvc-works/respo-value "0.1.2"]
                  [mvc-works/hsl "0.1.2"]])
 
 (require '[adzerk.boot-cljs   :refer [cljs]]
@@ -94,7 +94,8 @@
     (compile-cirru)
     (pom)
     (jar)
-    (install)))
+    (install)
+    (target)))
 
 (deftask deploy []
   (comp
